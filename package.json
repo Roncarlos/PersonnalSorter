@@ -1,0 +1,16 @@
+{
+  "name": "personnalsorter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "openai": "^4.31.0",
+    "pdf-text-reader": "^4.0.1",
+    "tesseract.js": "^4.0.6"
+  }
+}
