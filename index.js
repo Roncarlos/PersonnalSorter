@@ -34,7 +34,11 @@ const existingSubGroups = [];
         for (const file of files) {
 
             console.log('Handling file ' + file + '...');
+
             await handleFile(file);
+
+            console.log('File ' + file + ' handled!');
+            console.log('-'.repeat(20));
         }
     }
 
@@ -214,6 +218,8 @@ Réponds avec un json de la forme: { "filename": "nom-du-fichier", "group": "gro
 
         // it's a ```json``` string format so we remove the ```json and ``` part (first line and last line)
         const fixedJson = almostJson.split('\n').slice(1, -1).join('\n');
+
+        console.log('Fixed!');
 
         return JSON.parse(fixedJson);
     }
