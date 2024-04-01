@@ -13,6 +13,7 @@ const { readPdfPages } = require('pdf-text-reader');
 
 const toProcessFolder = './toProcess';
 const outputFolder = './output';
+const temperature = 0;
 
 const existingGroups = [];
 const existingSubGroups = [];
@@ -47,6 +48,8 @@ const existingSubGroups = [];
         // const { data: { text } } = await worker.recognize(`${toProcessFolder}/${file}`);
 
         const text = await getTextFromFile(file);
+
+        console.log('Text extracted successfully!')
 
         // Save the text in ./output folder with the same name as the image .txt
         try {
@@ -183,7 +186,10 @@ La classification doit être la plus précise possible, choisi un groupe et un s
 Si aucun groupe ou sous-groupe ne correspond, vous devez en créer un nouveau.
 C'est extrêmement important pour la classification des fichiers, donc si vous doutez, vous devez recréer un groupe ou sous-groupe.
 Utilise exclusivement du français pour le nom des groupes et sous-groupes.
-Réponds avec un json de la forme: { "filename": "nom-du-fichier", "group": "groupe", "subgroup": "sous-groupe" }.`;
+Le nom des groupes et des sous-groupes ne doit pas contenir de caractères spéciaux, de chiffre.
+Utilise uniquement des espaces pour séparer les mots.
+Réponds avec un json de la forme: { "filename": "nom-du-fichier", "group": "groupe", "subgroup": "sous-groupe" }.
+`;
 
         const userPrompt = text;
 
@@ -194,16 +200,27 @@ Réponds avec un json de la forme: { "filename": "nom-du-fichier", "group": "gro
                 { role: "user", content: userPrompt }
             ],
             max_tokens: -1,
-            temperature: 0.7,
+            temperature: temperature,
         });
 
         const jsonObject = getFixedJson(completion.choices[0].message.content);
+
+        fixGroupsAndSubGroups(jsonObject);
 
         return {
             filename: getFixedFilename(jsonObject.filename),
             group: jsonObject.group,
             subgroup: jsonObject.subgroup
         }
+    }
+
+    /**
+    *
+    * @param {{group: string, subgroup: string}} jsonObject
+    */
+    function fixGroupsAndSubGroups(jsonObject) {
+        jsonObject.group = jsonObject.group.replace("_", " ").trim();
+        jsonObject.subgroup = jsonObject.subgroup.replace("_", " ").trim();
     }
 
     function getFixedJson(stringFromLLM) {
